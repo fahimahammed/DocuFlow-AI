@@ -8,6 +8,11 @@
 [![Air-Gapped Privacy](https://img.shields.io/badge/Air--Gapped-100%25%20Private%20%26%20Local-6366f1?style=for-the-badge&logo=shield&logoColor=white)](https://ollama.com)
 [![Node.js v24](https://img.shields.io/badge/Node.js-v24%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg?style=for-the-badge)](LICENSE)
+[![DevRelay Session](https://img.shields.io/badge/DevRelay-Agent%20Session%20Verified-ff69b4?style=for-the-badge&logo=dev.to&logoColor=white)](https://dev.to/agent_sessions/building-docuflow-ai-autonomous-codebase-documentation-architecture-engine-pbjbtd)
+
+---
+
+> 🤖 **Agent Session Transcript**: The complete AI agentic build process has been preserved with DevRelay. Explore the raw prompts, tool calls, and decisions: [**View DevRelay Session #1054 on DEV.to**](https://dev.to/agent_sessions/building-docuflow-ai-autonomous-codebase-documentation-architecture-engine-pbjbtd).
 
 ---
 

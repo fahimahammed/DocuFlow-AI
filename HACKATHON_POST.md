@@ -3,7 +3,16 @@
 
 ---
 
-## 💡 What We Built: The "Codebase Audit as a Service" Side Hustle
+## 🤖 Agent Session & Build Logs (Show Your Work)
+We recorded and saved the entire agentic building process of this project using **[DevRelay](https://devrelay.com/)**. You can explore the full interactive transcript, prompts, tool calls, and code diffs:
+
+🔗 **[View Agent Session on DEV.to](https://dev.to/agent_sessions/building-docuflow-ai-autonomous-codebase-documentation-architecture-engine-pbjbtd)**
+
+```liquid
+{% agent_session building-docuflow-ai-autonomous-codebase-documentation-architecture-engine-pbjbtd %}
+```
+
+---
 Every software engineer, freelance consultant, and agency knows this nightmare: you sign a new client or join a new project, and they hand you a massive, tangled, 50,000-line legacy repository with zero documentation, no architecture diagrams, and no onboarding guide.
 
 Engineering teams spend **20% to 35% of their working hours** deciphering undocumented code, reverse-engineering API endpoints, and drawing box-and-arrow diagrams on whiteboards.
