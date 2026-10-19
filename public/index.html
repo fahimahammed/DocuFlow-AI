@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuFlow AI — Autonomous Codebase Documentation & Architecture Engine</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            },
+            accent: {
+              500: '#6366f1',
+              600: '#4f46e5',
+            },
+            slate: {
+              850: '#131c2e',
+              900: '#0b1120',
+              950: '#060a12'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Marked.js & DOMPurify for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Mermaid.js for architecture diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0f172a',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#334155',
+        lineColor: '#60a5fa',
+        secondaryColor: '#1e1b4b',
+        tertiaryColor: '#0f172a'
+      }
+    });
+  </script>
+
+  <!-- Highlight.js for code blocks -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/20 ring-1 ring-white/20">
+        <i data-lucide="file-code-2" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">DocuFlow AI</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium">Side Hustle Edition</span>
+        </div>
+        <p class="text-xs text-slate-400">Open-Source Codebase Documentation & Architecture Audit Engine</p>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3">
+      <div id="statusIndicator" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="statusDot"></span>
+        <span id="statusText" class="text-slate-300">Checking AI Engine...</span>
+      </div>
+
+      <button id="openSettingsBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition text-xs font-medium">
+        <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span>API Keys & Engine</span>
+      </button>
+
+      <a href="https://github.com" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition text-xs font-medium">
+        <i data-lucide="github" class="w-3.5 h-3.5"></i>
+        <span>Open Source</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- LEFT SIDEBAR: CONFIGURATION & CODEBASE SELECTION -->
+    <aside class="w-96 border-r border-slate-800/80 bg-slate-900/50 flex flex-col p-5 overflow-y-auto space-y-5">
+      
+      <!-- Source Selection Tabs -->
+      <div class="space-y-3">
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <span>1. Select Codebase Source</span>
+          <span class="text-[10px] text-brand-400 font-mono">AST Ready</span>
+        </label>
+        
+        <div class="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <button id="tabSample" class="tab-btn active-tab py-1.5 rounded-lg font-medium transition text-center">Sample</button>
+          <button id="tabPath" class="tab-btn py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition text-center">Local Path</button>
+          <button id="tabUpload" class="tab-btn py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition text-center">Upload ZIP</button>
+        </div>
+
+        <!-- Tab 1: Pre-packaged Samples -->
+        <div id="panelSample" class="space-y-2">
+          <div class="text-xs text-slate-400 mb-1">Click a pre-configured sample to test instantly:</div>
+          <div id="samplesList" class="space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Local Directory Path -->
+        <div id="panelPath" class="space-y-3 hidden">
+          <div class="text-xs text-slate-400">Specify absolute or relative path to any folder on your machine:</div>
+          <div class="relative">
+            <input type="text" id="localPathInput" placeholder="/path/to/my-codebase" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none transition font-mono">
+          </div>
+          <button id="scanPathBtn" class="w-full py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-300 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="scan" class="w-3.5 h-3.5 text-brand-400"></i>
+            <span>Inspect Path & Count Files</span>
+          </button>
+        </div>
+
+        <!-- Tab 3: Upload ZIP -->
+        <div id="panelUpload" class="space-y-3 hidden">
+          <div id="dropZone" class="border-2 border-dashed border-slate-800 hover:border-brand-500/50 rounded-xl p-5 text-center transition cursor-pointer bg-slate-950/40">
+            <i data-lucide="archive" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
+            <p class="text-xs text-slate-300 font-medium">Click to select or drop .zip file</p>
+            <p class="text-[10px] text-slate-500 mt-1">Extracts & parses repository locally</p>
+            <input type="file" id="zipFileInput" accept=".zip" class="hidden">
+          </div>
+          <div id="uploadStatus" class="text-xs text-brand-400 font-mono hidden"></div>
+        </div>
+      </div>
+
+      <hr class="border-slate-800/80">
+
+      <!-- AI Provider & Model Options -->
+      <div class="space-y-3">
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <span>2. Intelligence Engine</span>
+          <span class="text-[10px] text-slate-400">Dual Core</span>
+        </label>
+
+        <div class="space-y-2">
+          <!-- Engine Choice Radios -->
+          <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/50 hover:border-slate-700 cursor-pointer transition">
+            <input type="radio" name="engineProvider" value="gemini" checked class="mt-0.5 text-brand-500 focus:ring-0">
+            <div class="flex-1 text-xs">
+              <div class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <span>Google Gemini API</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">Fastest / 1M+ Context</span>
+              </div>
+              <p class="text-slate-400 mt-0.5 text-[11px]">Best for high-speed synthesis and large repositories with full-context understanding.</p>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/50 hover:border-slate-700 cursor-pointer transition">
+            <input type="radio" name="engineProvider" value="local" class="mt-0.5 text-brand-500 focus:ring-0">
+            <div class="flex-1 text-xs">
+              <div class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <span>Local Open-Weights (Ollama)</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">100% Air-Gapped</span>
+              </div>
+              <p class="text-slate-400 mt-0.5 text-[11px]">Runs Qwen2.5-Coder or Llama-3 locally. Zero data leaves your machine.</p>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-800 bg-slate-950/50 hover:border-slate-700 cursor-pointer transition">
+            <input type="radio" name="engineProvider" value="heuristic" class="mt-0.5 text-brand-500 focus:ring-0">
+            <div class="flex-1 text-xs">
+              <div class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <span>AST Structural Engine (Offline)</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-700/50 text-slate-300">Deterministic</span>
+              </div>
+              <p class="text-slate-400 mt-0.5 text-[11px]">Instant AST symbol parsing & Mermaid diagram layout with 0 tokens and 0 latency.</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- Dynamic Provider Settings (Gemini Key or Ollama URL) -->
+        <div id="geminiConfigBox" class="space-y-2 pt-1">
+          <div class="flex items-center justify-between text-xs">
+            <label class="text-slate-300 font-medium">Gemini API Key:</label>
+            <button id="toggleKeyVisibility" class="text-[10px] text-slate-400 hover:text-slate-200">Show/Hide</button>
+          </div>
+          <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none transition font-mono">
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Model:</span>
+            <select id="geminiModelSelect" class="bg-slate-900 border border-slate-800 text-slate-200 rounded px-2 py-1 text-xs outline-none">
+              <option value="gemini-2.5-flash">gemini-2.5-flash (Recommended)</option>
+              <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+              <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+              <option value="gemini-1.5-pro">gemini-1.5-pro (Deep reasoning)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="localConfigBox" class="space-y-2 pt-1 hidden">
+          <div class="flex items-center justify-between text-xs">
+            <label class="text-slate-300 font-medium">Ollama / Local URL:</label>
+            <span id="ollamaBadge" class="text-[10px] text-slate-500">Checking...</span>
+          </div>
+          <input type="text" id="localUrlInput" value="http://localhost:11434" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none transition font-mono">
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Model:</span>
+            <input type="text" id="localModelInput" value="qwen2.5-coder:7b" class="bg-slate-900 border border-slate-800 text-slate-200 rounded px-2 py-1 text-xs outline-none font-mono w-44">
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-slate-800/80">
+
+      <!-- Freelance Deliverable Branding -->
+      <div class="space-y-2">
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <span>3. Client Handoff Branding</span>
+          <span class="text-[10px] text-emerald-400">Monetize</span>
+        </label>
+        <div class="text-[11px] text-slate-400">Client or project name for the Audit Report deliverable:</div>
+        <input type="text" id="clientNameInput" value="Client Engineering & Product Team" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none transition">
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-2 space-y-2">
+        <button id="generateDocsBtn" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 via-emerald-600 to-teal-600 hover:from-brand-500 hover:to-teal-500 text-white font-semibold text-sm shadow-lg shadow-brand-600/30 ring-1 ring-white/20 transition flex items-center justify-center gap-2 group">
+          <i data-lucide="sparkles" class="w-4 h-4 group-hover:rotate-12 transition"></i>
+          <span>Generate Full Documentation</span>
+        </button>
+
+        <button id="quickAstBtn" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-medium text-xs transition flex items-center justify-center gap-1.5">
+          <i data-lucide="cpu" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>Instant AST Inspect (0ms / 0 Tokens)</span>
+        </button>
+      </div>
+
+      <!-- Codebase Stats Card -->
+      <div id="statsCard" class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-2 text-xs">
+        <div class="font-semibold text-slate-300 flex items-center justify-between">
+          <span>Active Codebase Target:</span>
+          <span id="targetBadge" class="text-[10px] text-brand-400 font-mono">Sample</span>
+        </div>
+        <div id="targetSummary" class="text-slate-400 font-mono text-[11px] truncate">Nexus E-Commerce Gateway</div>
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/60 text-slate-400">
+          <div>Files: <span id="statFiles" class="text-slate-200 font-semibold font-mono">-</span></div>
+          <div>Total LOC: <span id="statLines" class="text-slate-200 font-semibold font-mono">-</span></div>
+          <div>Symbols: <span id="statSymbols" class="text-slate-200 font-semibold font-mono">-</span></div>
+          <div>Engine: <span id="statEngine" class="text-brand-400 font-semibold font-mono">Gemini</span></div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT MAIN PANEL: DOCUMENTATION DISPLAY & VISUALIZER -->
+    <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden">
+      
+      <!-- NAVIGATION SUB-HEADER -->
+      <div class="border-b border-slate-800/80 bg-slate-900/40 px-6 py-2.5 flex items-center justify-between">
+        <!-- Document Section Tabs -->
+        <div class="flex items-center gap-1 overflow-x-auto text-xs">
+          <button class="doc-tab active-doc-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition" data-section="overview">
+            <i data-lucide="layout" class="w-3.5 h-3.5"></i>
+            <span>Overview & Stack</span>
+          </button>
+          <button class="doc-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition" data-section="architecture">
+            <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+            <span>Architecture & Diagrams</span>
+          </button>
+          <button class="doc-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition" data-section="api">
+            <i data-lucide="webhook" class="w-3.5 h-3.5"></i>
+            <span>API & Endpoints</span>
+          </button>
+          <button class="doc-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition" data-section="audit">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+            <span>Setup & Audit</span>
+          </button>
+          <button class="doc-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-amber-400/90 hover:text-amber-300 transition" data-section="clientAuditPacket">
+            <i data-lucide="briefcase" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Client Handoff Packet</span>
+          </button>
+          <button class="doc-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition" data-section="explorer">
+            <i data-lucide="folder-tree" class="w-3.5 h-3.5"></i>
+            <span>AST Explorer</span>
+          </button>
+        </div>
+
+        <!-- Export & Action Toolbar -->
+        <div class="flex items-center gap-2">
+          <button id="copyMdBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition text-xs font-medium" title="Copy Current Markdown">
+            <i data-lucide="copy" class="w-3 h-3"></i>
+            <span>Copy MD</span>
+          </button>
+          <button id="downloadBundleBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/30 transition text-xs font-medium" title="Download Complete Documentation Bundle">
+            <i data-lucide="download" class="w-3 h-3"></i>
+            <span>Download .md</span>
+          </button>
+          <button id="printBtn" class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition text-xs font-medium" title="Print to PDF">
+            <i data-lucide="printer" class="w-3 h-3"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- AGENT EXECUTION PROGRESS BAR (Visible during run) -->
+      <div id="progressContainer" class="hidden px-6 py-3 bg-slate-900/90 border-b border-brand-500/20 flex flex-col space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2 text-brand-400 font-medium">
+            <div class="w-2.5 h-2.5 rounded-full bg-brand-400 animate-ping"></div>
+            <span id="progressMessage">Orchestrating agent workflow...</span>
+          </div>
+          <span id="progressPercent" class="font-mono text-slate-400">Stage 2 of 5</span>
+        </div>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+          <div id="progressBar" class="bg-gradient-to-r from-brand-500 to-cyan-500 h-full w-1/3 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT VIEWER -->
+      <div class="flex-1 overflow-y-auto p-8 relative">
+        
+        <!-- Markdown Render Container -->
+        <article id="docContent" class="prose prose-invert prose-emerald max-w-4xl mx-auto space-y-4">
+          <!-- Default Welcome Screen -->
+          <div class="text-center py-16 space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center mx-auto shadow-xl shadow-brand-500/20 ring-1 ring-white/20">
+              <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Autonomous Codebase Documentation</h1>
+            <p class="text-slate-400 text-sm max-w-lg mx-auto">
+              Analyze any repository structure locally with open-source AST parsing, generate interactive Mermaid architecture diagrams, and synthesize full client handoff documentation with Google Gemini or Local Open-Weights.
+            </p>
+            <div class="flex items-center justify-center gap-3 pt-4">
+              <button id="quickStartBtn" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-medium text-xs shadow-lg transition flex items-center gap-2">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                <span>Analyze Sample Repository</span>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- AST Explorer Container (Hidden until tab selected) -->
+        <div id="astExplorerView" class="max-w-4xl mx-auto space-y-6 hidden">
+          <div>
+            <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+              <i data-lucide="folder-tree" class="w-5 h-5 text-brand-400"></i>
+              <span>AST File Tree & Extracted Symbol Registry</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Parsed directly from source files using open-source regex/AST tokenizers with zero network latency.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- File Tree Card -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+              <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                <i data-lucide="folder" class="w-4 h-4 text-amber-400"></i>
+                <span>Scanned File Hierarchy</span>
+              </h3>
+              <div id="fileTreeContainer" class="font-mono text-xs text-slate-300 space-y-1 max-h-96 overflow-y-auto"></div>
+            </div>
+
+            <!-- Extracted Symbols Card -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+              <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                <i data-lucide="code" class="w-4 h-4 text-cyan-400"></i>
+                <span>Discovered Symbols (Endpoints, Classes, Functions)</span>
+              </h3>
+              <div id="symbolsContainer" class="font-mono text-xs space-y-2 max-h-96 overflow-y-auto"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- API KEYS & ENGINE SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5 text-brand-400"></i>
+          <h3 class="text-base font-bold text-white">AI Engine & API Keys</h3>
+        </div>
+        <button id="closeSettingsBtn" class="text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Google Gemini API Key</label>
+          <p class="text-[11px] text-slate-400 mb-2">Used for high-speed synthesis and monorepo analysis. Saved securely in your browser's localStorage.</p>
+          <input type="password" id="modalGeminiKey" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none font-mono">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Local Open-Weights Endpoint (Ollama / vLLM)</label>
+          <p class="text-[11px] text-slate-400 mb-2">For 100% private, air-gapped code auditing.</p>
+          <input type="text" id="modalLocalUrl" value="http://localhost:11434" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none font-mono">
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+          <div class="font-semibold text-slate-300 flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Open Innovation Guarantee</span>
+          </div>
+          <p>You can toggle between local open-weight models (Qwen, Llama, DeepSeek) or Gemini at any time. When using Local mode or AST Inspect, zero bytes ever leave your machine.</p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button id="saveSettingsBtn" class="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs transition">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+

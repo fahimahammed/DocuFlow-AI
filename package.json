@@ -1,0 +1,25 @@
+{
+  "name": "docuflow-ai",
+  "version": "1.0.0",
+  "description": "Autonomous Codebase Documentation & Architecture Audit Engine (Side Hustle Edition)",
+  "main": "server/index.js",
+  "bin": {
+    "docuflow": "./bin/repodoc.js",
+    "repodoc": "./bin/repodoc.js"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "cli": "node bin/repodoc.js",
+    "test": "node --test"
+  },
+  "keywords": ["ai", "documentation", "gemini", "open-source", "side-hustle", "code-review", "mermaid"],
+  "type": "module",
+  "dependencies": {
+    "adm-zip": "^0.6.1",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "multer": "^2.4.0"
+  }
+}
