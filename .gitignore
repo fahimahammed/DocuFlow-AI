@@ -1,4 +1,9 @@
 node_modules
 .pnpm-store
 .env
-bin
+.DS_Store
+dist
+tmp
+.DS_Store
+dist
+tmp
